@@ -50,8 +50,12 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   // Produces a self-contained server bundle so the Dockerfile can ship a tiny
-  // runtime image. Vercel ignores this and uses its own build output.
-  output: "standalone",
+  // runtime image.
+  //
+  // Skipped on Vercel: it builds its own function bundles and layers a config
+  // of its own on top, and the combination fails looking for a trace manifest
+  // (`.next/next-server.js.nft.json`) that standalone mode doesn't emit there.
+  output: process.env.VERCEL ? undefined : "standalone",
   poweredByHeader: false,
   serverExternalPackages: ["mongodb"],
   async headers() {
