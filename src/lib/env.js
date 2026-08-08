@@ -44,8 +44,11 @@ export function stripeCurrency() {
 
 /**
  * Public origin of this deployment, used to build Stripe redirect URLs.
- * Falls back to the Vercel-provided host so a preview deployment redirects
- * back to itself rather than to production.
+ *
+ * Both Vercel and Render publish their own hostname, so a fresh deployment
+ * redirects back to itself with no configuration — and a preview/branch
+ * deployment returns to the preview rather than to production. `APP_URL` still
+ * wins when set, which is what a custom domain needs.
  */
 export function appUrl() {
   const explicit = process.env.APP_URL;
@@ -54,6 +57,10 @@ export function appUrl() {
   const vercel =
     process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
   if (vercel) return `https://${vercel}`;
+
+  // Render injects this automatically; it already includes the scheme.
+  const render = process.env.RENDER_EXTERNAL_URL;
+  if (render) return render.replace(/\/$/, "");
 
   return "http://localhost:3000";
 }

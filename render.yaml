@@ -1,42 +1,63 @@
-# Render blueprint — a long-running container.
+# Render blueprint.
 #
-# Note: the free instance type sleeps after ~15 minutes of inactivity, so it is
-# NOT continuously running. `starter` (or above) stays up permanently; change
-# `plan` below if you want the free tier and accept the sleep.
+# Deploy: Render dashboard -> New -> Blueprint -> pick this repo. Render reads
+# this file, creates the service, and prompts for the values marked
+# `sync: false` (they are secrets, so they are deliberately not in this file).
 #
-# Secrets are marked `sync: false`, which makes Render prompt for them in the
-# dashboard instead of storing them in this committed file.
+# Runtime is Node rather than Docker on purpose: Render builds it directly from
+# package.json, which is faster on the free instance type and avoids depending
+# on the Dockerfile. The Dockerfile is still there for Fly/Railway/a VPS.
+#
+# `plan: free` sleeps after ~15 minutes of inactivity, so the first request
+# after a quiet period takes ~30-60s to wake the container. That is the
+# trade-off for free; switch to `starter` for a genuinely always-on process.
 
 services:
   - type: web
     name: tuition-me
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    plan: starter
+    runtime: node
+    plan: free
     region: singapore
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
+      # Next.js requires Node 20.9+; pin it so a Render default change can't
+      # silently move the build to an older runtime.
+      - key: NODE_VERSION
+        value: "22"
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
+
+      # Auth.js sits behind Render's TLS-terminating proxy, so it has to be
+      # told the forwarded host is trustworthy when building callback URLs.
       - key: AUTH_TRUST_HOST
         value: "true"
+      # Generated once by Render and then held constant. Changing it signs
+      # every user out, so never regenerate it casually.
+      - key: AUTH_SECRET
+        generateValue: true
+
+      # Prompted for on first deploy.
       - key: MONGODB_URI
         sync: false
       - key: MONGODB_DB
         value: tuition-me
-      - key: AUTH_SECRET
-        generateValue: true
-      - key: AUTH_URL
-        sync: false
-      - key: APP_URL
-        sync: false
+
+      # APP_URL is intentionally omitted: the app falls back to Render's own
+      # RENDER_EXTERNAL_URL, so Stripe redirects point at this service without
+      # anyone having to know the hostname in advance. Set APP_URL only when
+      # you attach a custom domain.
+
+      # Optional — leave blank and the Google button simply doesn't render.
       - key: AUTH_GOOGLE_ID
         sync: false
       - key: AUTH_GOOGLE_SECRET
         sync: false
+
+      # Optional — checkout returns a clean 503 until these are set.
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
