@@ -27,7 +27,10 @@ export function mongoUri() {
 }
 
 export function mongoDbName() {
-  return process.env.MONGODB_DB || "tuition-me";
+  // Deliberately NOT "tuition-me": that database belongs to the older
+  // CRA/Express deployments, which are still live. A missing env var must not
+  // silently point this app at their data.
+  return process.env.MONGODB_DB || "tuitionMeNext";
 }
 
 export function stripeSecretKey() {

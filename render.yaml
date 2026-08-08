@@ -43,8 +43,10 @@ services:
       # Prompted for on first deploy.
       - key: MONGODB_URI
         sync: false
+      # This app has its own database. `tuition-me` belongs to the older
+      # CRA/Express deployments, which are still running against it.
       - key: MONGODB_DB
-        value: tuition-me
+        value: tuitionMeNext
 
       # APP_URL is intentionally omitted: the app falls back to Render's own
       # RENDER_EXTERNAL_URL, so Stripe redirects point at this service without
