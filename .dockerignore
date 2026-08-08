@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.gitignore
+.vercel
+.fly
+
+# Secrets must never end up in an image layer.
+.env
+.env.local
+.env.*.local
+
+README.md
+Dockerfile
+.dockerignore
+npm-debug.log*
+*.md

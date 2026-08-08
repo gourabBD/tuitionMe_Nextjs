@@ -1,0 +1,39 @@
+# Fly.io deployment — a genuinely always-on Node process (no cold starts).
+#
+#   fly launch --no-deploy --copy-config
+#   fly secrets set MONGODB_URI="…" AUTH_SECRET="…" AUTH_TRUST_HOST=true \
+#                   AUTH_URL="https://<app>.fly.dev" APP_URL="https://<app>.fly.dev" \
+#                   STRIPE_SECRET_KEY="…" STRIPE_WEBHOOK_SECRET="…"
+#   fly deploy
+#
+# Secrets are set with `fly secrets`, never in this file — it is committed.
+
+app = "tuition-me"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3000"
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # The whole point of this deployment target: keep one machine warm rather
+  # than paying a cold start on the first request after an idle period.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "20s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

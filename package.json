@@ -1,0 +1,38 @@
+{
+  "name": "tuition-me",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Tuition Me — a course marketplace. Full-stack Next.js (App Router) rebuild of the former CRA client + Express server.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed": "node --env-file=.env.local scripts/seed.mjs"
+  },
+  "dependencies": {
+    "@auth/mongodb-adapter": "^3.11.3",
+    "bcryptjs": "^3.0.3",
+    "bootstrap": "5.3.8",
+    "jose": "6.2.8",
+    "mongodb": "^6.21.0",
+    "next": "16.3.0",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "19.2.8",
+    "react-bootstrap": "2.10.10",
+    "react-dom": "19.2.8",
+    "react-hot-toast": "2.6.0",
+    "react-icons": "5.7.0",
+    "react-photo-view": "1.2.7",
+    "server-only": "0.0.1",
+    "stripe": "22.4.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.0"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

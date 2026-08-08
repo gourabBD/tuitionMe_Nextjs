@@ -1,0 +1,45 @@
+# Render blueprint — a long-running container.
+#
+# Note: the free instance type sleeps after ~15 minutes of inactivity, so it is
+# NOT continuously running. `starter` (or above) stays up permanently; change
+# `plan` below if you want the free tier and accept the sleep.
+#
+# Secrets are marked `sync: false`, which makes Render prompt for them in the
+# dashboard instead of storing them in this committed file.
+
+services:
+  - type: web
+    name: tuition-me
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    region: singapore
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: tuition-me
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_URL
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: AUTH_GOOGLE_ID
+        sync: false
+      - key: AUTH_GOOGLE_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_CURRENCY
+        value: usd
